@@ -1,0 +1,12 @@
+name: 'dsci532_group20'
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - ipykernel
+  - ipython>=7.15
+  - altair_saver
+  - pip
+  - pip:
+    - dash==1.18.1
+    - dash_bootstrap_components
