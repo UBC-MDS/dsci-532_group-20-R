@@ -60,7 +60,7 @@ bottom_left_plot <- function(hotel_type = "All",
     histogram_l <-
         ggplot(df, aes(x = reorder(`Country of origin`,-counts), y = counts)) +
         geom_bar(stat = "identity", fill = "orange") +
-        ggtitle("Top 20 Countries of Guests") +
+        ggtitle("Top 10 Countries of Guests") +
         xlab("Countries") +
         ylab("Reservations") +
         theme_bw() +
