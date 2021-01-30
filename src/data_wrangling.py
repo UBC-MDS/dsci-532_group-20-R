@@ -21,25 +21,6 @@ def getdata(hotel_type="All", weeks=[1, 53]):
 # Dataframe for main plots:
 def main_plot(hotel_type="All", weeks=[1, 53], y_col="Reservations"):
     df = getdata(hotel_type, weeks)
-    # if y_col == "Reservations":
-    #     print(y_col)
-    #     data_weekly = df.groupby("Arrival week")["Hotel type"].count() / df["Arrival year"].value_counts().count()
-    #     data_weekly = pd.DataFrame(data_weekly)
-    #     data_weekly = data_weekly.rename(columns={"Hotel type": "Reservations"}).reset_index()
-    # elif y_col == "Average daily rate per person":
-    #     print(y_col)
-    #     data_weekly = df.groupby("Arrival week")["Average daily rate per person"].mean()
-    #     data_weekly = pd.DataFrame(data_weekly)
-    # elif y_col == "Required parking spaces":
-    #     print(y_col)
-    #     data_weekly = df.groupby("Arrival week")["Required parking spaces"].sum() / df["Arrival year"].value_counts().count()/ 7
-    #     data_weekly = pd.DataFrame(data_weekly)
-    # else:#
-    #     print(y_col)
-    #     data_weekly = df.groupby("Arrival week")["Adults"].sum() / df["Arrival year"].value_counts().count()
-    #     data_weekly = pd.DataFrame(data_weekly)
-
-    ###################################
     reservations_weekly = (
         df.groupby("Arrival week")["Hotel type"].count()
         / df["Arrival year"].value_counts().count()
@@ -90,13 +71,13 @@ def main_plot(hotel_type="All", weeks=[1, 53], y_col="Reservations"):
 # Dataframe for countries plot:
 def left_plot(hotel_type="All", weeks=[1, 53]):
     df = getdata(hotel_type, weeks)
-    top_20_countries = (
+    top_10_countries = (
         df.groupby("Country of origin")
         .size()
         .reset_index(name="counts")
-        .sort_values(by="counts", ascending=False)[:20]
+        .sort_values(by="counts", ascending=False)[:10]
     )
-    return top_20_countries
+    return top_10_countries
 
 
 # Dataframe for Stay Length plot:
