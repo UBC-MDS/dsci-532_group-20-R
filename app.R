@@ -11,7 +11,7 @@ library(dashBootstrapComponents)
 use_virtualenv("dsci532_group20")
 
 # Import functions from data_wrangling script
-source_python('src/data_wrangling.py')
+# source_python('src/data_wrangling.py')
 
 columns <-
     list(
@@ -98,6 +98,88 @@ bottom_right_plot <- function(hotel_type = "All",
         )
     ggplotly(histogram_r)
 }
+
+############### NEW DATA WRANGLING FUNCTIONS #######################
+getdata <- function(hotel_type="All", weeks=c(1, 53)) {
+  hotels <- read_csv("data/processed/clean_hotels.csv")
+  hotel_trim <- hotels
+  hotel_trim <- na.omit(hotel_trim)
+  if (hotel_type == "Resort"){
+    hotel_trim <- hotel_trim %>% 
+      filter(`Hotel type` == "Resort")
+  }
+  if (hotel_type == "City"){
+
+    hotel_trim <- hotel_trim %>% 
+      filter(`Hotel type` == "City")
+  }
+  hotel_trim <- hotel_trim %>% 
+    filter(`Arrival week` >= weeks[1]) %>% 
+    filter(`Arrival week` <= weeks[2])
+  hotel_trim
+}
+
+main_plot <- function(hotel_type="All", weeks=c(1, 53), y_col="Reservations") {
+  df <- getdata(hotel_type, weeks)
+  reservations_weekly <- df %>% 
+    group_by(`Arrival week`) %>% 
+    summarise(Reservations = n()/length(unique(df$`Arrival year`)))
+  # prices_weekly <- df %>% 
+  #   group_by(`Arrival week`) %>% 
+  #   summarise(`Average daily rate per person` = mean())
+  parking_weekly <- df %>% 
+    group_by(`Arrival week`) %>% 
+    summarise(`Required parking spaces` = sum(`Required parking spaces`)/length(unique(df$`Arrival year`)))
+  adults_weekly <- df %>% 
+    group_by(`Arrival week`) %>% 
+    summarise(Adults = sum(Adults)/length(unique(df$`Arrival year`)))
+  children_weekly <- df %>% 
+    group_by(`Arrival week`) %>% 
+    summarise(Children = sum(Children)/length(unique(df$`Arrival year`)))
+  babies_weekly <- df %>% 
+    group_by(`Arrival week`) %>% 
+    summarise(Babies = sum(Babies)/length(unique(df$`Arrival year`)))
+  changes_weekly <- df %>% 
+    group_by(`Arrival week`) %>% 
+    summarise(`Booking changes` = sum(`Booking changes`)/length(unique(df$`Arrival year`)))
+  special_weekly <- df %>% 
+    group_by(`Arrival week`) %>% 
+    summarise(`Special requests` = sum(`Special requests`)/length(unique(df$`Arrival year`)))
+ 
+  # TODO: fix infinities problem in `Average rate per person` 
+  # it is causing `prices weekly` to break
+  # data_weekly <- left_join(reservations_weekly, prices_weekly)
+  # data_weekly <- left_join(data_weekly, parking_weekly)
+  data_weekly <- left_join(reservations_weekly, parking_weekly)
+
+  data_weekly <- left_join(data_weekly, adults_weekly)
+  data_weekly <- left_join(data_weekly, children_weekly)
+  data_weekly <- left_join(data_weekly, babies_weekly)
+  data_weekly <- left_join(data_weekly, changes_weekly)
+  data_weekly <- left_join(data_weekly, special_weekly)
+  data_weekly
+}
+
+left_plot <- function(hotel_type="All", weeks=c(1, 53)) {
+  df <- getdata(hotel_type, weeks)
+  top_10_countries <- df %>% 
+    group_by(`Country of origin`) %>% 
+    summarise(counts = n()) %>% 
+    arrange(desc(counts))
+  top_10_countries[1:10,]
+}
+
+right_plot <- function(hotel_type="All", weeks=c(1, 53)) {
+  df <- getdata(hotel_type, weeks)
+  df <- df %>% 
+    mutate(`Total Nights of Stay` = `Weekend nights` + `Week nights`)
+  stay_nights <- data.frame(table(df$`Total Nights of Stay`))
+  stay_nights <- stay_nights %>% 
+    mutate(`Percent of Reservations` = Freq / sum(Freq) * 100)
+  colnames(stay_nights) <- c("hotel", "Number of Nights of Stay", "Percent of Reservations")
+  stay_nights
+}
+#####################################################################
 
 top_graph <- dccGraph(id = "lines",
                       figure = top_plot(),
