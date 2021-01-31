@@ -1,6 +1,5 @@
 # Import packages
 library(tidyverse, quietly = TRUE)
-library(reticulate)
 library(plotly)
 library(dash)
 library(dashCoreComponents)
