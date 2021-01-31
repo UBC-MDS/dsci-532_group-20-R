@@ -95,7 +95,7 @@ bottom_right_plot <- function(hotel_type = "All",
 ############### NEW DATA WRANGLING FUNCTIONS #######################
 getdata <- function(hotel_type = "All",
                     weeks = c(1, 53)) {
-  hotels <- read_csv("data/processed/clean_hotels.csv")
+  hotels <- readr::read_csv(here::here('data', 'processed', 'clean_hotels.csv'))
   hotel_trim <- hotels
   hotel_trim <-
     do.call(data.frame, lapply(hotel_trim, function(x)
@@ -310,4 +310,4 @@ app$callback(
   }
 )
 
-app$run_server(debug = T)
+app$run_server(host = '0.0.0.0')
